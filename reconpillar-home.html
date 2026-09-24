@@ -1,0 +1,738 @@
+<title>ReconPillar — Jobsite Environmental Monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --navy:#0B1627;--navy-dark:#070d1a;--navy-mid:#1a2e50;
+  --yellow:#dee41c;--yellow-dark:#bbc100;--yellow-light:#f7faa0;
+  --grey:#A6AABF;--silver:#ECEFF3;
+  --surface:#fff;--ground:#ECEFF3;
+  --text:#0B1627;--muted:#5a647a;--border:#d8dce8;--border-soft:#eaecf4;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --yellow-light:#262800;
+  --surface:#131e33;--ground:#0d1525;
+  --text:#e8edf7;--muted:#A6AABF;--border:#1e2e48;--border-soft:#18253e;
+}}
+:root[data-theme="dark"]{
+  --yellow-light:#262800;
+  --surface:#131e33;--ground:#0d1525;
+  --text:#e8edf7;--muted:#A6AABF;--border:#1e2e48;--border-soft:#18253e;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',system-ui,sans-serif;background:var(--ground);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}img{max-width:100%}
+
+/* NAV */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:200;padding-inline:max(20px,5vw);transition:background .25s,box-shadow .25s}
+.nav.scrolled{background:var(--navy);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.nav-inner{max-width:1160px;margin:0 auto;height:62px;display:flex;align-items:center;gap:32px}
+.nav-logo{display:flex;align-items:center;flex-shrink:0}
+.nav-links{display:flex;gap:4px;list-style:none;margin-left:auto}
+.nav-btn{background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.875rem;font-weight:500;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:4px;transition:color .2s,background .2s;white-space:nowrap}
+.nav-btn:hover,.has-mega.open .nav-btn{color:var(--yellow)}
+.has-mega.open .nav-btn{background:rgba(222,228,28,.08)}
+.caret{width:10px;height:6px;flex-shrink:0;transition:transform .22s;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.has-mega.open .caret{transform:rotate(180deg)}
+.nav-cta{margin-left:8px;padding:8px 22px;border-radius:4px;font-size:.85rem;font-weight:700;transition:all .2s;flex-shrink:0;background:var(--yellow);color:var(--navy);font-family:'Montserrat',sans-serif;letter-spacing:.02em}
+.nav-cta:hover{background:#c8ce14;transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}}
+
+/* MEGA MENU PANELS */
+.mega-panel{position:fixed;top:62px;left:0;right:0;background:var(--navy);border-top:2px solid var(--yellow);border-bottom:1px solid rgba(255,255,255,.07);box-shadow:0 20px 60px rgba(0,0,0,.45);padding:36px max(20px,5vw) 28px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;transform:translateY(-8px);z-index:199}
+.has-mega.open .mega-panel{opacity:1;pointer-events:auto;transform:translateY(0)}
+.mega-inner{max-width:1160px;margin:0 auto}
+.mega-section-label{font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+
+/* Products grid — 3 columns × 2 rows */
+.mega-products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.mp-item{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:6px;cursor:pointer;transition:background .15s;text-decoration:none}
+.mp-item:hover{background:rgba(255,255,255,.06)}
+.mp-ico{width:38px;height:38px;border-radius:5px;background:rgba(222,228,28,.1);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.mp-copy h4{font-family:'Roboto',sans-serif;font-size:.82rem;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;transition:color .15s}
+.mp-copy p{font-size:.74rem;color:rgba(255,255,255,.38);line-height:1.5}
+.mp-item:hover .mp-copy h4{color:var(--yellow)}
+
+/* Solutions grid — 2 columns + callout */
+.mega-solutions-wrap{display:grid;grid-template-columns:1fr 1fr 300px;gap:24px;align-items:start}
+.mega-solutions-grid{display:flex;flex-direction:column;gap:2px}
+.ms-item{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:6px;cursor:pointer;transition:background .15s;text-decoration:none}
+.ms-item:hover{background:rgba(255,255,255,.06)}
+.ms-ico{font-size:1.05rem;width:28px;text-align:center;flex-shrink:0}
+.ms-label{font-family:'Roboto',sans-serif;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.04em;transition:color .15s}
+.ms-item:hover .ms-label{color:var(--yellow)}
+
+/* Callout card inside Solutions mega */
+.mega-callout{background:rgba(222,228,28,.07);border:1px solid rgba(222,228,28,.2);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.mega-callout-eyebrow{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(222,228,28,.6)}
+.mega-callout h4{font-family:'Roboto',sans-serif;font-size:.95rem;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:.02em;line-height:1.3}
+.mega-callout p{font-size:.76rem;color:rgba(255,255,255,.45);line-height:1.6}
+.mega-callout-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--yellow);color:var(--navy);font-family:'Montserrat',sans-serif;font-size:.78rem;font-weight:700;border-radius:4px;transition:background .15s;align-self:flex-start;margin-top:4px}
+.mega-callout-btn:hover{background:#c8ce14}
+
+/* Simple dropdown cols (Resources, Company) */
+.mega-simple{display:flex;gap:6px;flex-wrap:wrap}
+.msl-item{display:flex;flex-direction:column;gap:3px;padding:14px 18px;border-radius:6px;min-width:172px;cursor:pointer;transition:background .15s;text-decoration:none}
+.msl-item:hover{background:rgba(255,255,255,.06)}
+.msl-title{font-family:'Roboto',sans-serif;font-size:.82rem;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;transition:color .15s}
+.msl-desc{font-size:.74rem;color:rgba(255,255,255,.35);line-height:1.45;margin-top:2px}
+.msl-item:hover .msl-title{color:var(--yellow)}
+
+/* Mega footer strip */
+.mega-footer{margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mega-footer p{font-size:.76rem;color:rgba(255,255,255,.3)}
+.mega-footer-cta{padding:7px 18px;background:var(--yellow);color:var(--navy);font-family:'Montserrat',sans-serif;font-size:.76rem;font-weight:700;border-radius:4px;transition:background .15s;white-space:nowrap}
+.mega-footer-cta:hover{background:#c8ce14}
+
+/* HERO */
+.hero{background:var(--navy);padding:128px max(20px,5vw) 96px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#070d1a 0%,#0B1627 60%,#121f3a 100%);pointer-events:none}
+.hero::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(222,228,28,.08) 0%,transparent 70%);top:-80px;right:-40px;pointer-events:none}
+.hero-inner{max-width:1160px;margin:0 auto;position:relative;z-index:1}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(222,228,28,.12);border:1px solid rgba(222,228,28,.3);color:var(--yellow);font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:3px;margin-bottom:24px}
+.hero-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--yellow);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:'Roboto',sans-serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.0;text-wrap:balance;max-width:700px;margin-bottom:22px;text-transform:uppercase}
+.hero h1 em{font-style:normal;color:var(--yellow)}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.65);max-width:520px;margin-bottom:36px;line-height:1.75}
+.tag-row{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:44px}
+.tag{padding:6px 15px;border-radius:3px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.6);font-size:.78rem;font-weight:600;transition:all .4s;letter-spacing:.02em}
+.tag.lit{background:rgba(222,228,28,.15);border-color:rgba(222,228,28,.45);color:var(--yellow)}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-yellow{padding:14px 28px;background:var(--yellow);color:var(--navy);font-weight:700;font-size:.9rem;border-radius:4px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;font-family:'Montserrat',sans-serif;border:none;cursor:pointer;letter-spacing:.02em}
+.btn-yellow:hover{background:#c8ce14;transform:translateY(-1px)}
+.btn-outline{padding:14px 28px;background:transparent;color:rgba(255,255,255,.8);font-weight:500;font-size:.9rem;border-radius:4px;border:1px solid rgba(255,255,255,.22);transition:all .2s;display:inline-flex;align-items:center;font-family:'Montserrat',sans-serif;cursor:pointer}
+.btn-outline:hover{border-color:var(--yellow);color:var(--yellow)}
+
+/* TRUST BAR */
+.trust-bar{background:#070d1a;padding:15px max(20px,5vw);border-bottom:1px solid rgba(222,228,28,.12);text-align:center}
+.trust-bar p{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.trust-bar strong{color:rgba(255,255,255,.6);font-weight:700}
+
+/* STATS */
+.stats-section{background:var(--navy);padding:52px max(20px,5vw)}
+.stats-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:8px 28px;text-align:center;border-right:1px solid rgba(255,255,255,.1)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:'Roboto',sans-serif;font-size:2.8rem;font-weight:900;color:var(--yellow);letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+.stat-label{font-size:.8rem;color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.03em}
+@media(max-width:680px){
+  .stats-inner{grid-template-columns:1fr 1fr;gap:32px 0}
+  .stat-item{border-right:none;padding:0 20px}
+  .stat-item:nth-child(odd){border-right:1px solid rgba(255,255,255,.1)}
+  .stat-item:nth-child(3),.stat-item:nth-child(4){padding-top:32px;border-top:1px solid rgba(255,255,255,.1)}
+}
+
+/* USE CASE SECTION */
+.use-case-section{padding:88px 0;background:var(--ground)}
+.section-lead{max-width:1160px;margin:0 auto;padding-inline:max(20px,5vw);margin-bottom:40px}
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow-dark);margin-bottom:10px}
+.section-lead h2{font-family:'Roboto',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;color:var(--text);letter-spacing:-.02em;text-wrap:balance;text-transform:uppercase}
+.carousel-track{display:flex;gap:16px;padding:8px max(20px,5vw) 36px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;cursor:grab;scrollbar-width:none}
+.carousel-track::-webkit-scrollbar{display:none}
+.carousel-track.grabbing{cursor:grabbing}
+.use-card{flex:0 0 272px;background:var(--surface);border:1px solid var(--border);border-top:3px solid transparent;border-radius:6px;padding:26px;scroll-snap-align:start;transition:border-color .2s,box-shadow .2s,transform .2s;cursor:pointer}
+.use-card:hover{border-top-color:var(--yellow);box-shadow:0 6px 28px rgba(0,0,0,.08);transform:translateY(-2px)}
+.card-icon{width:44px;height:44px;border-radius:6px;background:var(--yellow-light);display:grid;place-items:center;font-size:1.3rem;margin-bottom:18px}
+.use-card h3{font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.use-card p{font-size:.83rem;color:var(--muted);line-height:1.62}
+
+/* PERSONA */
+.persona-section{background:var(--surface);border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:88px max(20px,5vw)}
+.persona-inner{max-width:1160px;margin:0 auto}
+.persona-head{margin-bottom:40px}
+.persona-head h2{font-family:'Roboto',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;color:var(--text);letter-spacing:-.02em;text-wrap:balance;margin-top:10px;text-transform:uppercase}
+.tab-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:52px}
+.ptab{padding:9px 22px;border-radius:3px;border:1px solid var(--border);font-size:.85rem;font-weight:700;color:var(--muted);cursor:pointer;background:none;font-family:'Montserrat',sans-serif;transition:all .2s;letter-spacing:.02em}
+.ptab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ptab:hover:not(.on){border-color:var(--navy);color:var(--navy)}
+.panel{display:none}
+.panel.on{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:740px){.panel.on{grid-template-columns:1fr;gap:36px}}
+.panel-text h3{font-family:'Roboto',sans-serif;font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:900;color:var(--text);letter-spacing:-.01em;margin-bottom:14px;text-wrap:balance;text-transform:uppercase}
+.panel-text p{font-size:.975rem;color:var(--muted);line-height:1.75;margin-bottom:28px}
+.checks{display:flex;flex-direction:column;gap:14px}
+.check-item{display:flex;gap:12px;align-items:flex-start}
+.check-dot{width:20px;height:20px;border-radius:2px;background:var(--yellow);flex-shrink:0;display:grid;place-items:center;margin-top:2px}
+.check-dot svg{width:10px;height:10px;stroke:var(--navy);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.check-item span{font-size:.875rem;color:var(--text);line-height:1.55}
+.dash-mock{background:var(--navy);border-radius:8px;padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;border:2px solid rgba(222,228,28,.15)}
+.dash-mock::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--yellow)}
+.dash-top{display:flex;justify-content:space-between;align-items:center}
+.dash-label{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase}
+.dash-live{display:flex;align-items:center;gap:6px;font-size:.7rem;color:rgba(255,255,255,.4)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 2s infinite}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-cell{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:14px}
+.d-val{font-family:'Roboto Mono',monospace;font-size:1.5rem;font-weight:500;color:#fff;letter-spacing:-.02em;line-height:1;margin-bottom:3px}
+.d-lbl{font-size:.66rem;color:rgba(255,255,255,.38);font-weight:500}
+.d-delta{font-size:.66rem;color:var(--yellow);font-weight:600;margin-top:3px}
+.d-delta.warn{color:#f87171}
+.alert-bar{background:rgba(222,228,28,.1);border:1px solid rgba(222,228,28,.2);border-radius:4px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:.78rem;color:rgba(222,228,28,.85)}
+.a-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow);flex-shrink:0}
+
+/* FEATURES */
+.features-section{padding:88px max(20px,5vw);background:var(--ground)}
+.features-grid{max-width:1160px;margin:40px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.f-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:6px;padding:28px;border-top:3px solid var(--yellow)}
+.f-icon{font-size:1.4rem;margin-bottom:14px;display:block}
+.f-card h4{font-family:'Roboto',sans-serif;font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.f-card p{font-size:.83rem;color:var(--muted);line-height:1.65}
+
+/* TESTIMONIALS */
+.testimonials-section{background:var(--navy);padding:88px max(20px,5vw)}
+.testimonials-inner{max-width:1160px;margin:0 auto}
+.testimonials-section .eyebrow{color:rgba(222,228,28,.65)}
+.testimonials-section h2{font-family:'Roboto',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-.02em;text-wrap:balance;text-transform:uppercase;margin-top:10px;margin-bottom:48px}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}
+.t-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:28px 28px 24px;position:relative;display:flex;flex-direction:column}
+.t-card::before{content:'\201C';font-family:'Roboto',sans-serif;font-size:3.5rem;font-weight:900;color:var(--yellow);opacity:.25;position:absolute;top:10px;left:22px;line-height:1;pointer-events:none}
+.t-quote{font-size:.88rem;color:rgba(255,255,255,.72);line-height:1.75;padding-top:28px;flex:1;margin-bottom:20px}
+.t-author{padding-top:16px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:2px}
+.t-name{font-size:.8rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.t-title{font-size:.74rem;color:rgba(255,255,255,.38)}
+.t-company{font-size:.74rem;color:var(--yellow);opacity:.85;margin-top:1px}
+
+/* CTA */
+.cta-section{background:var(--navy);border-top:1px solid rgba(255,255,255,.07);padding:96px max(20px,5vw);text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(222,228,28,.07) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-50%);pointer-events:none}
+.cta-section h2{font-family:'Roboto',sans-serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:14px;text-wrap:balance;text-transform:uppercase;position:relative}
+.cta-section p{font-size:1.05rem;color:rgba(255,255,255,.55);margin-bottom:36px;position:relative}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* FOOTER */
+footer{background:#060c18;padding:56px max(20px,5vw) max(40px,calc(env(safe-area-inset-bottom,0px) + 40px))}
+.footer-grid{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+@media(max-width:800px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr}}
+.f-brand-name{font-family:'Roboto',sans-serif;font-weight:900;font-size:1.25rem;color:#fff;margin-bottom:10px;letter-spacing:.08em;text-transform:uppercase}
+.footer-brand p{font-size:.82rem;color:rgba(255,255,255,.3);line-height:1.65;max-width:220px;margin-bottom:16px}
+.footer-email{font-size:.82rem;color:var(--yellow);opacity:.8}
+.footer-col h5{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:16px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col a{font-size:.82rem;color:rgba(255,255,255,.38);transition:color .2s}
+.footer-col a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{max-width:1160px;margin:0 auto;padding-top:28px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.75rem;color:rgba(255,255,255,.2)}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-pill::before,.live-dot{animation:none}
+  .tag,.use-card,.btn-yellow,.btn-outline,.nav-cta{transition:none}
+}
+</style>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg width="148" height="32" viewBox="0 0 148 32" fill="none" aria-label="ReconPillar">
+        <rect x="0" y="5" width="80" height="22" fill="#0B1627"/>
+        <rect x="60" y="0" width="88" height="28" fill="#dee41c"/>
+        <text x="4" y="21" font-family="'Roboto', sans-serif" font-weight="900" font-size="16" fill="#dee41c" letter-spacing="1">RECON</text>
+        <text x="63" y="20" font-family="'Roboto', sans-serif" font-weight="900" font-size="16" fill="#0B1627" letter-spacing="1">PILLAR</text>
+      </svg>
+    </a>
+
+    <ul class="nav-links">
+
+      <!-- PRODUCTS -->
+      <li class="has-mega" id="mn-products">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false">
+          Products
+          <svg class="caret" viewBox="0 0 10 6"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div class="mega-panel" role="menu">
+          <div class="mega-inner">
+            <div class="mega-section-label">Monitoring Solutions</div>
+            <div class="mega-products-grid">
+              <a class="mp-item" href="#">
+                <div class="mp-ico">🌬️</div>
+                <div class="mp-copy"><h4>Air Quality</h4><p>CO, VOCs, particulates, and dust — protect workers and occupants in real time.</p></div>
+              </a>
+              <a class="mp-item" href="#">
+                <div class="mp-ico">🔊</div>
+                <div class="mp-copy"><h4>Noise Monitoring</h4><p>Track construction noise against regulatory and community thresholds continuously.</p></div>
+              </a>
+              <a class="mp-item" href="#">
+                <div class="mp-ico">📳</div>
+                <div class="mp-copy"><h4>Vibration</h4><p>Protect adjacent structures and sensitive equipment from construction-induced vibration.</p></div>
+              </a>
+              <a class="mp-item" href="#">
+                <div class="mp-ico">🌡️</div>
+                <div class="mp-copy"><h4>Weather &amp; Dew Point</h4><p>Temperature, humidity, and dew point data for coatings, concrete, and drywall compliance.</p></div>
+              </a>
+              <a class="mp-item" href="#">
+                <div class="mp-ico">💧</div>
+                <div class="mp-copy"><h4>Water &amp; Moisture</h4><p>Detect leaks and water intrusion the moment they happen — before mold and rework follow.</p></div>
+              </a>
+              <a class="mp-item" href="#">
+                <div class="mp-ico">⚠️</div>
+                <div class="mp-copy"><h4>Site Conditions</h4><p>Pressure, mold risk, and carbon monoxide — monitored 24/7 across every zone and floor.</p></div>
+              </a>
+            </div>
+            <div class="mega-footer">
+              <p>Pillar Smart Pods — 8 metrics per device · 18-month battery · no site Wi-Fi required</p>
+              <a href="#" class="mega-footer-cta">View All Products →</a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- SOLUTIONS -->
+      <li class="has-mega" id="mn-solutions">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false">
+          Solutions
+          <svg class="caret" viewBox="0 0 10 6"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div class="mega-panel" role="menu">
+          <div class="mega-inner">
+            <div class="mega-solutions-wrap">
+              <div>
+                <div class="mega-section-label">By Role</div>
+                <div class="mega-solutions-grid">
+                  <a class="ms-item" href="#personas"><span class="ms-ico">🏗️</span><span class="ms-label">General Contractors</span></a>
+                  <a class="ms-item" href="#personas"><span class="ms-ico">👷</span><span class="ms-label">Superintendents</span></a>
+                  <a class="ms-item" href="#personas"><span class="ms-ico">🦺</span><span class="ms-label">Safety Managers</span></a>
+                </div>
+              </div>
+              <div>
+                <div class="mega-section-label">&nbsp;</div>
+                <div class="mega-solutions-grid">
+                  <a class="ms-item" href="#personas"><span class="ms-ico">📊</span><span class="ms-label">Project Executives</span></a>
+                  <a class="ms-item" href="#personas"><span class="ms-ico">🏢</span><span class="ms-label">Owners &amp; Developers</span></a>
+                  <a class="ms-item" href="#personas"><span class="ms-ico">🔍</span><span class="ms-label">Inspectors &amp; AHJs</span></a>
+                </div>
+              </div>
+              <div class="mega-callout">
+                <div class="mega-callout-eyebrow">Featured Story</div>
+                <h4>How Avalon Bay Got a Building Code Exception</h4>
+                <p>ReconPillar data convinced the City of Emeryville to approve drywall installation early — saving weeks of schedule.</p>
+                <a href="#" class="mega-callout-btn">Read Case Study →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- RESOURCES -->
+      <li class="has-mega" id="mn-resources">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false">
+          Resources
+          <svg class="caret" viewBox="0 0 10 6"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div class="mega-panel" role="menu">
+          <div class="mega-inner">
+            <div class="mega-section-label">Learn &amp; Explore</div>
+            <div class="mega-simple">
+              <a class="msl-item" href="#">
+                <span class="msl-title">Case Studies</span>
+                <span class="msl-desc">Real outcomes from DPR, Gilbane, Avalon Bay, and Harvard Business School.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Spec Sheet</span>
+                <span class="msl-desc">Hardware specs, radio, connectivity, battery, and environmental ratings.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Blog</span>
+                <span class="msl-desc">Environmental monitoring insights for the construction industry.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">ROI Calculator</span>
+                <span class="msl-desc">Estimate what one avoided rework incident is worth on your project.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Help Center</span>
+                <span class="msl-desc">Deployment guides, alert setup, and dashboard walkthroughs.</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- COMPANY -->
+      <li class="has-mega" id="mn-company">
+        <button class="nav-btn" aria-haspopup="true" aria-expanded="false">
+          Company
+          <svg class="caret" viewBox="0 0 10 6"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div class="mega-panel" role="menu">
+          <div class="mega-inner">
+            <div class="mega-section-label">Recon Dynamics</div>
+            <div class="mega-simple">
+              <a class="msl-item" href="#">
+                <span class="msl-title">About Us</span>
+                <span class="msl-desc">Our story, mission, and the team behind ReconPillar.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Careers</span>
+                <span class="msl-desc">Join a team building the future of jobsite intelligence.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Contact Us</span>
+                <span class="msl-desc">Talk to sales or reach our support team directly.</span>
+              </a>
+              <a class="msl-item" href="#">
+                <span class="msl-title">Trust Center</span>
+                <span class="msl-desc">Security, privacy, and data practices.</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+    <a href="#contact" class="nav-cta">Get Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-pill">Environmental Monitoring Platform</div>
+    <h1>Know Conditions Remotely.<br><em>Reduce Rework.</em></h1>
+    <p class="hero-sub">Get alerts when environmental conditions threaten your workflow — and act faster to correct them. Pillar Smart Pods monitor 8 site conditions continuously, with real-time alerts and automated documentation across every project.</p>
+    <div class="tag-row" id="tagRow">
+      <span class="tag">Temperature</span>
+      <span class="tag">Humidity</span>
+      <span class="tag">Carbon Monoxide</span>
+      <span class="tag">Particulates</span>
+      <span class="tag">Noise</span>
+      <span class="tag">VOCs</span>
+      <span class="tag">Pressure</span>
+      <span class="tag">Water Intrusion</span>
+    </div>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-yellow">See ReconPillar in Action →</a>
+      <a href="#use-cases" class="btn-outline">Explore Use Cases</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <p>Trusted by <strong>DPR</strong> · <strong>Gilbane</strong> · <strong>Avalon Bay</strong> · <strong>Harvard Business School</strong> and leading contractors nationwide</p>
+</div>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Metrics Per Device</div></div>
+    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Users Per Project</div></div>
+    <div class="stat-item"><div class="stat-num">&lt;5 min</div><div class="stat-label">Deploy Time</div></div>
+    <div class="stat-item"><div class="stat-num">18 mo</div><div class="stat-label">Battery Life</div></div>
+  </div>
+</section>
+
+<!-- USE CASE CAROUSEL -->
+<section class="use-case-section" id="use-cases">
+  <div class="section-lead">
+    <div class="eyebrow">Use Cases</div>
+    <h2>Monitor What Matters, From the Field to the Cloud</h2>
+  </div>
+  <div class="carousel-track" id="carouselTrack">
+    <div class="use-card">
+      <div class="card-icon">🌬️</div>
+      <h3>Air Quality Monitoring</h3>
+      <p>Monitor dust, particulates, CO, and VOCs continuously. Protect workers, occupants, and sensitive environments with real-time data and instant alerts.</p>
+    </div>
+    <div class="use-card">
+      <div class="card-icon">🔊</div>
+      <h3>Noise Monitoring</h3>
+      <p>Track construction noise levels against project, regulatory, and community thresholds — with continuous data to respond to complaints before they escalate.</p>
+    </div>
+    <div class="use-card">
+      <div class="card-icon">📳</div>
+      <h3>Vibration Monitoring</h3>
+      <p>Monitor ground and structural vibration to protect neighboring buildings, sensitive equipment, and occupied spaces from construction impacts.</p>
+    </div>
+    <div class="use-card">
+      <div class="card-icon">🌡️</div>
+      <h3>Weather & Dew Point</h3>
+      <p>Track temperature, humidity, and dew point that impact material installation, concrete curing, coating applications, and day-to-day operations.</p>
+    </div>
+    <div class="use-card">
+      <div class="card-icon">💧</div>
+      <h3>Water & Moisture</h3>
+      <p>Detect leaks and water intrusion the moment they happen. Protect finished materials, prevent mold, and avoid costly remediation work.</p>
+    </div>
+    <div class="use-card">
+      <div class="card-icon">⚠️</div>
+      <h3>Site Conditions</h3>
+      <p>Monitor carbon monoxide, pressure, and mold-risk conditions across every zone — day and night, with automated alerts when something changes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PERSONA SECTION -->
+<section class="persona-section" id="personas">
+  <div class="persona-inner">
+    <div class="persona-head">
+      <div class="eyebrow">Built For Your Role</div>
+      <h2>One Platform. Every Stakeholder.</h2>
+    </div>
+    <div class="tab-row">
+      <button class="ptab on" data-p="gc">General Contractors</button>
+      <button class="ptab" data-p="super">Superintendents</button>
+      <button class="ptab" data-p="exec">Project Executives</button>
+    </div>
+
+    <!-- GC PANEL -->
+    <div class="panel on" id="p-gc">
+      <div class="panel-text">
+        <h3>Control Every Site. Every Condition.</h3>
+        <p>General contractors sit at the center of every risk on a project. ReconPillar gives your whole team — and your client — one shared source of truth across every active site.</p>
+        <div class="checks">
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Real-time monitoring and alerts across every active site, in one dashboard</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Role-based access — PMs, supers, safety, MEP, and QA each see what matters to them</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Time-stamped, exportable data for owner reporting, insurance, disputes, and closeout</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>No wiring, no battery swaps, no IT lift — deploy on a new site in minutes</span></div>
+        </div>
+      </div>
+      <div class="dash-mock">
+        <div class="dash-top"><div class="dash-label">Project Overview</div><div class="dash-live"><div class="live-dot"></div> Live</div></div>
+        <div class="dash-grid">
+          <div class="d-cell"><div class="d-val">8</div><div class="d-lbl">Active Sites</div><div class="d-delta">↑ All monitored</div></div>
+          <div class="d-cell"><div class="d-val">54%</div><div class="d-lbl">Humidity — Level 4</div><div class="d-delta">↑ Within spec</div></div>
+          <div class="d-cell"><div class="d-val">71°F</div><div class="d-lbl">Concrete Temp</div><div class="d-delta">↑ ACI 305 compliant</div></div>
+          <div class="d-cell"><div class="d-val">0</div><div class="d-lbl">Open Alerts</div><div class="d-delta">↑ All clear</div></div>
+        </div>
+        <div class="alert-bar"><div class="a-dot"></div>Tower B cure documentation ready for owner handoff</div>
+      </div>
+    </div>
+
+    <!-- SUPERINTENDENT PANEL -->
+    <div class="panel" id="p-super">
+      <div class="panel-text">
+        <h3>Know Before You Walk It.</h3>
+        <p>You can't walk every floor every hour. ReconPillar watches the site when you can't — so you know the moment conditions change, not the next time you happen to walk by.</p>
+        <div class="checks">
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Instant TXT alerts for leaks, temp heater failures, high CO, or moisture spikes — overnight and weekends</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>View conditions by floor or zone — know exactly which area needs attention before you walk it</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Historical trend data to justify holding or releasing a trade for drywall, flooring, or paint</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Export condition records for inspectors, AHJs, or owners when a building-code exception is needed</span></div>
+        </div>
+      </div>
+      <div class="dash-mock">
+        <div class="dash-top"><div class="dash-label">Floor 12 — East Wing</div><div class="dash-live"><div class="live-dot"></div> Recording</div></div>
+        <div class="dash-grid">
+          <div class="d-cell"><div class="d-val">68°F</div><div class="d-lbl">Temperature</div><div class="d-delta">↑ Nominal</div></div>
+          <div class="d-cell"><div class="d-val">52%</div><div class="d-lbl">Relative Humidity</div><div class="d-delta">↑ Pre-drywall OK</div></div>
+          <div class="d-cell"><div class="d-val">4 ppm</div><div class="d-lbl">CO Level</div><div class="d-delta">↑ Well below limit</div></div>
+          <div class="d-cell"><div class="d-val">71 dB</div><div class="d-lbl">Noise Level</div><div class="d-delta warn">↑ Near threshold</div></div>
+        </div>
+        <div class="alert-bar"><div class="a-dot"></div>Moisture conditions cleared — drywall trade released for Level 11</div>
+      </div>
+    </div>
+
+    <!-- PROJECT EXECUTIVE PANEL -->
+    <div class="panel" id="p-exec">
+      <div class="panel-text">
+        <h3>Portfolio-Wide Visibility. Fewer Surprises.</h3>
+        <p>You're accountable for outcomes across projects you can't personally walk every day. ReconPillar gives you the visibility to catch risk early — and the record to show you did.</p>
+        <div class="checks">
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Monitor every active project from one dashboard — by site, region, or portfolio</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Get alerted to serious conditions — flooding, mold-forming humidity — anywhere in your portfolio</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Export reporting for ownership updates, insurance reviews, and internal risk audits</span></div>
+          <div class="check-item"><div class="check-dot"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span>Standardize thresholds and alert routing so risk management is consistent across all sites</span></div>
+        </div>
+      </div>
+      <div class="dash-mock">
+        <div class="dash-top"><div class="dash-label">Portfolio Overview</div><div class="dash-live"><div class="live-dot"></div> Live</div></div>
+        <div class="dash-grid">
+          <div class="d-cell"><div class="d-val">12</div><div class="d-lbl">Active Projects</div><div class="d-delta">↑ All monitored</div></div>
+          <div class="d-cell"><div class="d-val">0</div><div class="d-lbl">Critical Alerts</div><div class="d-delta">↑ All clear</div></div>
+          <div class="d-cell"><div class="d-val">23</div><div class="d-lbl">Reports Generated</div><div class="d-delta">↑ This month</div></div>
+          <div class="d-cell"><div class="d-val">99%</div><div class="d-lbl">Data Uptime</div><div class="d-delta">↑ 90-day avg</div></div>
+        </div>
+        <div class="alert-bar"><div class="a-dot"></div>Q3 closeout package ready — Harbor Commons Phase 2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="section-lead">
+    <div class="eyebrow">Platform Strengths</div>
+    <h2>Everything Your Jobsite Needs. Nothing It Doesn't.</h2>
+  </div>
+  <div class="features-grid">
+    <div class="f-card"><span class="f-icon">⚡</span><h4>Plug-and-Play in Minutes</h4><p>Mount with a magnet, strap, or 2×4 slot. Any crew member deploys a sensor in under five minutes — no networking, no configuration, no IT ticket.</p></div>
+    <div class="f-card"><span class="f-icon">📡</span><h4>Cellular, Not Site Wi-Fi</h4><p>Pillar Smart Pods run on 915 MHz ISM radio and connect to the cloud over cellular — so they work in basements, shafts, and dead zones where Wi-Fi never reaches.</p></div>
+    <div class="f-card"><span class="f-icon">🔋</span><h4>18-Month Battery Life</h4><p>Non-rechargeable Lithium Thionyl Chloride battery rated for 18 months. Deploy on day one and don't think about batteries until the project is done.</p></div>
+    <div class="f-card"><span class="f-icon">🔔</span><h4>Instant Text &amp; Email Alerts</h4><p>Set thresholds, route alerts by role and zone. The superintendent gets the leak on their floor; safety gets the CO spike. No forwarding required.</p></div>
+    <div class="f-card"><span class="f-icon">📄</span><h4>Automatic Paper Trail</h4><p>Every reading logged with a timestamp. Compliance reports and closeout packages generate themselves — ready for owners, inspectors, and insurance.</p></div>
+    <div class="f-card"><span class="f-icon">👥</span><h4>Unlimited Users</h4><p>Every stakeholder — GC, sub, owner, safety manager, inspector — gets access at no extra cost. No seat fees, no user caps, ever.</p></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div class="eyebrow">What Our Customers Say</div>
+    <h2>Trusted Across the Project Team</h2>
+    <div class="testimonials-grid">
+      <div class="t-card">
+        <p class="t-quote">I'm on a ski lift in Vermont, I get a text notification that the temp heater is acting up. I'm able to call our guy near the site and take action before I get off the lift. That one save made the whole system worth it. I'd have had burst pipes by the end of the weekend.</p>
+        <div class="t-author">
+          <span class="t-name">Brendan O'Connor</span>
+          <span class="t-title">Site Superintendent</span>
+          <span class="t-company">Northpoint II</span>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">The City of Emeryville, CA was reluctant to let our project team start drywalling because of high moisture. I took several sensors' data and showed them the printouts. They found our readings to be credible and granted an exception to the building code to let us install drywall earlier.</p>
+        <div class="t-author">
+          <span class="t-name">Joe Marilley</span>
+          <span class="t-title">Head Superintendent</span>
+          <span class="t-company">Avalon Bay</span>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">I guarantee that my site would not be as clean if we were not using the Pillar system. They know we are watching. Now I am seeing workers use vacuums, chop saw covers and more to keep the dust down. I've never seen a contractor try so hard to keep clean.</p>
+        <div class="t-author">
+          <span class="t-name">Paul Dietel</span>
+          <span class="t-title">Director of Capital Programs</span>
+          <span class="t-company">Harvard Business School</span>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">I've never used an easier IOT solution.</p>
+        <div class="t-author">
+          <span class="t-name">Ankoor Amin</span>
+          <span class="t-title">Head of IOT</span>
+          <span class="t-company">DPR</span>
+        </div>
+      </div>
+      <div class="t-card">
+        <p class="t-quote">We use this data to assure engineers that the humidity is exactly what they expected 24/7.</p>
+        <div class="t-author">
+          <span class="t-name">Mike Izzo</span>
+          <span class="t-title">Senior PM</span>
+          <span class="t-company">Gilbane</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>See ReconPillar in Action</h2>
+  <p>We'll walk you through a demo tailored to your project types and team structure.</p>
+  <div class="cta-btns">
+    <a href="mailto:sales@reconpillar.com" class="btn-yellow">Request a Demo →</a>
+    <a href="#" class="btn-outline">Contact Sales</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="f-brand-name">ReconPillar</div>
+      <p>Wireless jobsite environmental monitoring built for construction teams that can't afford surprises.</p>
+      <a href="mailto:sales@reconpillar.com" class="footer-email">sales@reconpillar.com</a>
+    </div>
+    <div class="footer-col"><h5>Products</h5><ul>
+      <li><a href="#">Air Quality</a></li>
+      <li><a href="#">Noise Monitoring</a></li>
+      <li><a href="#">Vibration Monitoring</a></li>
+      <li><a href="#">Weather Monitoring</a></li>
+      <li><a href="#">Site Conditions</a></li>
+    </ul></div>
+    <div class="footer-col"><h5>Solutions</h5><ul>
+      <li><a href="#">General Contractors</a></li>
+      <li><a href="#">Superintendents</a></li>
+      <li><a href="#">Safety Managers</a></li>
+      <li><a href="#">Project Executives</a></li>
+      <li><a href="#">Owners</a></li>
+    </ul></div>
+    <div class="footer-col"><h5>Company</h5><ul>
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Contact Us</a></li>
+      <li><a href="#">Trust Center</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ReconPillar · Recon Dynamics LLC. All rights reserved.</span>
+    <span>Trusted where mistakes aren't an option.</span>
+  </div>
+</footer>
+
+<script>
+/* ── Scroll nav ── */
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 50); }, {passive:true});
+
+/* ── Hero tag rotator ── */
+const tags = document.querySelectorAll('#tagRow .tag');
+let cur = 0;
+tags[0].classList.add('lit');
+setInterval(() => { tags[cur].classList.remove('lit'); cur = (cur+1)%tags.length; tags[cur].classList.add('lit'); }, 2200);
+
+/* ── Carousel drag ── */
+const track = document.getElementById('carouselTrack');
+let down=false, sx=0, sl=0;
+track.addEventListener('mousedown', e => { down=true; sx=e.pageX-track.offsetLeft; sl=track.scrollLeft; track.classList.add('grabbing'); });
+document.addEventListener('mouseup', () => { down=false; track.classList.remove('grabbing'); });
+track.addEventListener('mousemove', e => { if(!down) return; e.preventDefault(); track.scrollLeft = sl-(e.pageX-track.offsetLeft-sx)*1.4; });
+
+/* ── Persona tabs ── */
+document.querySelectorAll('.ptab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+    tab.classList.add('on');
+    document.getElementById('p-'+tab.dataset.p).classList.add('on');
+  });
+});
+
+/* ── Mega menu ── */
+const megaItems = document.querySelectorAll('.has-mega');
+let closeTimer = null;
+
+function openMega(item) {
+  clearTimeout(closeTimer);
+  megaItems.forEach(i => { if(i!==item) closeMega(i,true); });
+  item.classList.add('open');
+  item.querySelector('.nav-btn').setAttribute('aria-expanded','true');
+}
+function closeMega(item, immediate) {
+  if(immediate) {
+    item.classList.remove('open');
+    item.querySelector('.nav-btn').setAttribute('aria-expanded','false');
+  } else {
+    closeTimer = setTimeout(() => {
+      item.classList.remove('open');
+      item.querySelector('.nav-btn').setAttribute('aria-expanded','false');
+    }, 140);
+  }
+}
+
+megaItems.forEach(item => {
+  const btn = item.querySelector('.nav-btn');
+  const panel = item.querySelector('.mega-panel');
+
+  // hover
+  item.addEventListener('mouseenter', () => openMega(item));
+  item.addEventListener('mouseleave', () => closeMega(item, false));
+  panel.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  panel.addEventListener('mouseleave', () => closeMega(item, false));
+
+  // click / keyboard toggle
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    item.classList.contains('open') ? closeMega(item, true) : openMega(item);
+  });
+});
+
+// close on outside click or Escape
+document.addEventListener('click', e => {
+  if(!e.target.closest('.has-mega')) megaItems.forEach(i => closeMega(i, true));
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') megaItems.forEach(i => closeMega(i, true));
+});
+</script>
